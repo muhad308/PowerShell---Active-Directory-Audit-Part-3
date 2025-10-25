@@ -1,12 +1,12 @@
-# 1. Läs in JSON-filen med Get-Content och ConvertFrom-Json
+# 1. Load the JSON file with Get-ContentandConvertFrom-Json
 $data = Get-Content -Path "ad_export.json" -Raw | ConvertFrom-Json
 
-# 2. Visa domännamn och exportdatum
+# 2. View domain name and export date
 Write-Host "Domain: $($data.domain)"
 Write-Host "Export Date: $($data.export_date)"
 Write-Host ""
 
-# 3. Lista alla användare som inte loggat in på 30+ dagar
+# 3. List all users who have not logged in for 30+ days
 $thresholdDate = (Get-Date).AddDays(-30)
 $inactiveUsers = @()  # Create an empty array
 
@@ -23,7 +23,7 @@ foreach ($user in $inactiveUsers) {
 }
 Write-Host ""
 
-# 4. Räkna antal användare per avdelning med enkel loop
+# 4. Count number of users per department with a simple loop
 $deptCount = @{}  # Create an empty hashtable
 
 foreach ($user in $data.users) {

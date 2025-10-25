@@ -1,20 +1,8 @@
-<#
-.SYNOPSIS
-    Advanced AD Audit Example – demonstrates PowerShell functions, grouping, exporting, 
-    calculated properties, and robust error handling.
 
-.DESCRIPTION
-    Reads AD data from a JSON export, filters inactive users, detects expiring accounts,
-    and generates a formatted executive report.
-#>
-
-# --------------------------
-# Function: Get-InactiveAccounts
-# --------------------------
 function Get-InactiveAccounts {
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [int]$Days = 30
     )
 
@@ -23,71 +11,68 @@ function Get-InactiveAccounts {
         $inactive = $data.users | Where-Object {
             try {
                 ([datetime]$_.lastLogon) -lt $threshold
-            } catch {
+            }
+            catch {
                 Write-Warning "Could not parse lastLogon for user $($_.samAccountName)"
                 $false
             }
         }
         return $inactive
-    } catch {
+    }
+    catch {
         Write-Error "Error occurred in Get-InactiveAccounts: $_"
     }
 }
 
-# --------------------------
-# Load JSON data
-# --------------------------
+
 try {
     $data = Get-Content -Path "ad_export.json" -Raw | ConvertFrom-Json
-} catch {
+}
+catch {
     Write-Error "Failed to load or parse ad_export.json. Error: $_"
     exit
 }
 
-# --------------------------
-# Data Analysis
-# --------------------------
 
-# Inactive users (30+ days)
 $inactiveUsers = Get-InactiveAccounts -Days 30
 
-# Users with passwords older than 90 days
 $oldPasswords = $data.users | Where-Object {
     try {
         ((Get-Date) - [datetime]$_.passwordLastSet).Days -gt 90
-    } catch {
+    }
+    catch {
         Write-Warning "Invalid passwordLastSet date for $($_.samAccountName)"
         $false
     }
 }
 
-# Accounts expiring within 30 days
 $expiringAccounts = $data.users | Where-Object {
     try {
         ([datetime]$_.accountExpires) -lt (Get-Date).AddDays(30)
-    } catch {
+    }
+    catch {
         Write-Warning "Invalid accountExpires date for $($_.samAccountName)"
         $false
     }
 }
 
-# Computers not seen in 30+ days
 if ($data.PSObject.Properties.Name -contains 'computers') {
     $staleComputers = $data.computers | Where-Object {
         try {
             ([datetime]$_.lastLogon) -lt (Get-Date).AddDays(-30)
-        } catch {
+        }
+        catch {
             Write-Warning "Invalid computer lastLogon for $($_.name)"
             $false
         }
     }
-} else {
+}
+else {
     $staleComputers = @()
 }
 
-# --------------------------
-# Generate Executive Report
-# --------------------------
+
+
 $report = @"
 ====================================================
             ACTIVE DIRECTORY EXECUTIVE REPORT
