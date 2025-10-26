@@ -8,7 +8,7 @@ Write-Host ""
 
 # 3. List all users who have not logged in for 30+ days
 $thresholdDate = (Get-Date).AddDays(-30)
-$inactiveUsers = @()  # Create an empty array
+$inactiveUsers = @()  
 
 foreach ($user in $data.users) {
     $lastLogon = [datetime]$user.lastLogon
@@ -24,13 +24,14 @@ foreach ($user in $inactiveUsers) {
 Write-Host ""
 
 # 4. Count number of users per department with a simple loop
-$deptCount = @{}  # Create an empty hashtable
+$deptCount = @{}  
 
 foreach ($user in $data.users) {
     $dept = $user.department
     if ($deptCount.ContainsKey($dept)) {
         $deptCount[$dept] += 1
-    } else {
+    }
+    else {
         $deptCount[$dept] = 1
     }
 }

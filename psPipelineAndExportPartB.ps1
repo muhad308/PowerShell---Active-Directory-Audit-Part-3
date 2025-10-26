@@ -27,7 +27,6 @@ $usersWithPwdAge | Format-Table -AutoSize
 Write-Host ""
 
 # 3. Group computers per site 
-# (Example assumes 'computers' exists in your JSON)
 if ($data.PSObject.Properties.Name -contains 'computers') {
     Write-Host "Computers grouped per site:"
     $data.computers | Group-Object -Property site | ForEach-Object {

@@ -118,7 +118,6 @@ END OF REPORT
 ====================================================
 "@
 
-# Save the report
 $report | Out-File -FilePath "AD_Executive_Report.txt" -Encoding UTF8
 
 Write-Host "✅ Report generated successfully: AD_Executive_Report.txt"
